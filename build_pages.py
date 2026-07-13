@@ -27,7 +27,7 @@ EXT_LINK_RE = re.compile(r'<a href="(https?://[^"]+)"')
 
 def meta_of(text: str) -> dict:
     def grab(pat):
-        m = re.search(pat, text)
+        m = re.search(pat, text, re.MULTILINE)
         return m.group(1).strip() if m else ""
     title = grab(r"^#\s+(.+?)\s*$")
     title = re.sub(r"\s*—\s*Deep Research Report\s*$", "", title)
