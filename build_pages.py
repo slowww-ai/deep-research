@@ -16,9 +16,10 @@ RESEARCH = "/Users/gieunkwak/Data_Analytics/SlowAI/automations/research"
 OUT = os.path.join(RESEARCH, "deep-research-site")
 
 PROJECTS = [
-    ("stock-investing", "How to invest in stocks"),
-    ("bioprocess-e2e", "End-to-end bioprocess manufacturing"),
-    ("second-brain", "Second-brain systems"),
+    {"slug": "stock-investing", "label": "How to invest in stocks", "report": "REPORT.md", "output": "stock-investing.html", "lang": "en"},
+    {"slug": "bioprocess-e2e", "label": "End-to-end bioprocess manufacturing · 한국어", "report": "REPORT.md", "output": "bioprocess-e2e.html", "lang": "ko", "alternate": "bioprocess-e2e-en.html", "alternate_label": "English"},
+    {"slug": "bioprocess-e2e", "label": "End-to-end bioprocess manufacturing · English", "report": "REPORT.en.md", "output": "bioprocess-e2e-en.html", "lang": "en", "alternate": "bioprocess-e2e.html", "alternate_label": "한국어"},
+    {"slug": "second-brain", "label": "Second-brain systems", "report": "REPORT.md", "output": "second-brain.html", "lang": "en"},
 ]
 
 TOC_BLOCK_RE = re.compile(r"\n## Table of contents\n.*?\n---\n", re.DOTALL)
@@ -33,10 +34,10 @@ def meta_of(text: str) -> dict:
     title = re.sub(r"\s*—\s*Deep Research Report\s*$", "", title)
     return {
         "title": title,
-        "purpose": grab(r"\*\*Purpose:\*\*\s*(.+?)\s*(?:\n|$)"),
+        "purpose": grab(r"\*\*(?:Purpose|목적):\*\*\s*(.+?)\s*(?:\n|$)"),
         "leaves": grab(r"\*\*Leaves:\*\*\s*(\d+)"),
         "asof": grab(r"\*\*As of:\*\*\s*([0-9-]+)"),
-        "evidence": grab(r"\*\*Evidence:\*\*\s*(.+?)\s*(?:\n|$)"),
+        "evidence": grab(r"\*\*(?:Evidence|증거):\*\*\s*(.+?)\s*(?:\n|$)"),
     }
 
 
@@ -74,6 +75,7 @@ PAGE = """<!doctype html>
 <header class="topbar">
   <a class="home" href="index.html" title="All reports">&#8592;</a>
   <span class="crumb">{title}</span>
+  {alternate}
   <button id="toc-btn" aria-label="Contents">Contents</button>
   <button id="theme-btn" aria-label="Toggle theme">&#9681;</button>
 </header>
@@ -123,8 +125,9 @@ a:hover{text-decoration:underline}
 .topbar .home{font-size:1.25rem;line-height:1;color:var(--fg);padding:.1rem .3rem}
 .topbar .crumb{font-weight:600;font-size:.95rem;flex:1;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
-.topbar button{background:none;border:1px solid var(--line);color:var(--fg);
+.topbar button,.topbar .alternate{background:none;border:1px solid var(--line);color:var(--fg);
   border-radius:8px;padding:.28rem .6rem;font-size:.85rem;cursor:pointer}
+.topbar .alternate:hover{text-decoration:none;border-color:var(--accent);color:var(--accent)}
 #toc-btn{display:none}
 
 .layout{display:grid;grid-template-columns:19rem 1fr;gap:0;align-items:start}
@@ -263,8 +266,9 @@ def build():
     os.makedirs(OUT, exist_ok=True)
     gen = datetime.datetime.fromtimestamp(os.path.getmtime(__file__)).strftime("%Y-%m-%d")
     cards = []
-    for slug, short in PROJECTS:
-        src = os.path.join(RESEARCH, slug, "report", "REPORT.md")
+    for project in PROJECTS:
+        slug = project["slug"]
+        src = os.path.join(RESEARCH, slug, "report", project["report"])
         if not os.path.exists(src):
             print("  skip (missing):", slug); continue
         with open(src, encoding="utf-8") as f:
@@ -277,9 +281,14 @@ def build():
         body = md.convert(text)
         body = EXT_LINK_RE.sub(r'<a target="_blank" rel="noopener" href="\1"', body)
         toc = render_toc(md.toc_tokens)
+        alternate = ""
+        if project.get("alternate"):
+            alternate = (f'<a class="alternate" href="{project["alternate"]}">'
+                         f'{project["alternate_label"]}</a>')
         page = PAGE.format(title=html.escape(meta["title"]), css=CSS, js=JS,
-                           toc=toc, body=body, gen=gen)
-        with open(os.path.join(OUT, slug + ".html"), "w", encoding="utf-8") as f:
+                           toc=toc, body=body, gen=gen, alternate=alternate)
+        page = page.replace('<html lang="en">', f'<html lang="{project["lang"]}">', 1)
+        with open(os.path.join(OUT, project["output"]), "w", encoding="utf-8") as f:
             f.write(page)
         m = []
         if meta["leaves"]: m.append(f'{meta["leaves"]} sections')
@@ -290,10 +299,10 @@ def build():
             if src_: m.append(f'{src_.group(1)} sources')
         if meta["asof"]: m.append(f'as of {meta["asof"]}')
         cards.append(
-            f'<a class="card" href="{slug}.html"><h2>{html.escape(meta["title"])}</h2>'
+            f'<a class="card" href="{project["output"]}"><h2>{html.escape(project["label"])}</h2>'
             f'<p class="p">{html.escape(meta["purpose"])}</p>'
             f'<div class="m">{"".join(f"<span>{x}</span>" for x in m)}</div></a>')
-        print("  built:", slug + ".html", f'({len(body)//1024} KB)')
+        print("  built:", project["output"], f'({len(body)//1024} KB)')
 
     index = (f'<!doctype html><html lang="en"><head><meta charset="utf-8">'
              f'<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'

@@ -34,8 +34,9 @@ a:hover{text-decoration:underline}
 .topbar .home{font-size:1.25rem;line-height:1;color:var(--fg);padding:.1rem .3rem}
 .topbar .crumb{font-weight:600;font-size:.95rem;flex:1;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
-.topbar button{background:none;border:1px solid var(--line);color:var(--fg);
+.topbar button,.topbar .alternate{background:none;border:1px solid var(--line);color:var(--fg);
   border-radius:8px;padding:.28rem .6rem;font-size:.85rem;cursor:pointer}
+.topbar .alternate:hover{text-decoration:none;border-color:var(--accent);color:var(--accent)}
 #toc-btn{display:none}
 
 .layout{display:grid;grid-template-columns:19rem 1fr;gap:0;align-items:start}
@@ -99,6 +100,7 @@ article hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
 <header class="topbar">
   <a class="home" href="index.html" title="All reports">&#8592;</a>
   <span class="crumb">How to invest in stocks — comprehensive methodology map</span>
+
   <button id="toc-btn" aria-label="Contents">Contents</button>
   <button id="theme-btn" aria-label="Toggle theme">&#9681;</button>
 </header>
@@ -4031,7 +4033,7 @@ article hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
 <ul>
 <li>v1: initial map, approved by user (full 37-leaf / 11-Part structure); report language English (M2 parallel structure-critics (coverage/framing/currency) + user approval at G1)</li>
 </ul></article>
-    <footer class="pagefoot">Generated 2026-07-14 · <a href="index.html">All reports</a></footer>
+    <footer class="pagefoot">Generated 2026-07-18 · <a href="index.html">All reports</a></footer>
   </main>
 </div>
 <div id="scrim"></div>
