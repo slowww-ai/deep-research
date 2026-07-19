@@ -16,6 +16,7 @@ RESEARCH = "/Users/gieunkwak/Data_Analytics/SlowAI/automations/research"
 OUT = os.path.join(RESEARCH, "deep-research-site")
 
 PROJECTS = [
+    {"slug": "forward-deployed-engineering-korea", "label": "Forward-deployed engineering in South Korea", "report": "REPORT.md", "output": "forward-deployed-engineering-korea.html", "lang": "en"},
     {"slug": "stock-investing", "label": "How to invest in stocks", "report": "REPORT.md", "output": "stock-investing.html", "lang": "en"},
     {"slug": "bioprocess-e2e", "label": "End-to-end bioprocess manufacturing · 한국어", "report": "REPORT.md", "output": "bioprocess-e2e.html", "lang": "ko", "alternate": "bioprocess-e2e-en.html", "alternate_label": "English"},
     {"slug": "bioprocess-e2e", "label": "End-to-end bioprocess manufacturing · English", "report": "REPORT.en.md", "output": "bioprocess-e2e-en.html", "lang": "en", "alternate": "bioprocess-e2e.html", "alternate_label": "한국어"},
@@ -75,7 +76,7 @@ PAGE = """<!doctype html>
 <header class="topbar">
   <a class="home" href="index.html" title="All reports">&#8592;</a>
   <span class="crumb">{title}</span>
-  {alternate}
+{alternate}
   <button id="toc-btn" aria-label="Contents">Contents</button>
   <button id="theme-btn" aria-label="Toggle theme">&#9681;</button>
 </header>
@@ -283,7 +284,7 @@ def build():
         toc = render_toc(md.toc_tokens)
         alternate = ""
         if project.get("alternate"):
-            alternate = (f'<a class="alternate" href="{project["alternate"]}">'
+            alternate = (f'  <a class="alternate" href="{project["alternate"]}">'
                          f'{project["alternate_label"]}</a>')
         page = PAGE.format(title=html.escape(meta["title"]), css=CSS, js=JS,
                            toc=toc, body=body, gen=gen, alternate=alternate)

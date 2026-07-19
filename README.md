@@ -25,6 +25,7 @@ The generator reads each `../<slug>/report/REPORT.md` and rewrites the HTML here
 
 Reports currently published (edit the `PROJECTS` list in `build_pages.py` to add/remove):
 
+- `forward-deployed-engineering-korea`
 - `stock-investing`
 - `bioprocess-e2e`
 - `second-brain`
